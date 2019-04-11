@@ -1,0 +1,43 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from matplotlib.pylab import rcParams
+rcParams['figure.figsize'] = 15,7
+
+data = pd.read_csv('data.csv')
+
+df = pd.DataFrame(data)
+
+x = df['Date']
+y= df['Value']
+
+def data_std_err(y):
+    result = np.std(y) / len(y)**0.5
+    return result
+
+x = np.array(range(len(y)))
+x = x.reshape(-1,1)
+#x_train, x_test, y_train, y_test = train_test_split(x, y, train_size = 0.8, test_size = 0.2, random_state=6)
+lr = LinearRegression()
+lr.fit(x, y)
+y_predict= lr.predict(x)
+upperband = [i+ lr.intercept_ + 2 * np.std(y)/(len(y)**0.5) for i in y_predict]
+lowerband = [i- lr.intercept_ - 2 * np.std(y)/(len(y)**0.5) for i in y_predict]
+plt.scatter(x,y,alpha=0.4)
+plt.plot(x,y_predict)
+plt.plot(x,upperband)
+plt.plot(x,lowerband)
+
+plt.show()
+#Standard Deviation
+print ("Standard Deviation:",np.std(y))
+#Standard Error
+print ("Standard Error: ",data_std_err(y))
+#Variance
+#print ("Variance:",np.var(y))
+#Median
+print ("Median:",np.median(y))
+print ("Coeficient:",lr.coef_[0])
+print ("Intercept:",lr.intercept_)
